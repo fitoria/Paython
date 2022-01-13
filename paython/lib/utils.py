@@ -43,11 +43,11 @@ def parse_xml(element):
 
         if e.attributes:
             t['attribute'] = {}
-            for attribute in e.attributes.values():
+            for attribute in list(e.attributes.values()):
                 t['attribute'][attribute.nodeName] = attribute.childNodes[0].nodeValue
 
         if e.childNodes:
-            if t.has_key('attribute'):
+            if 'attribute' in t:
                 t['meta'] = parse_xml(e)
             else:
                 if len(e.childNodes) == 1:
@@ -61,7 +61,7 @@ def parse_xml(element):
         if not t:
             t = e.nodeValue
 
-        if root.has_key(e.nodeName):
+        if e.nodeName in root:
             if not isinstance(root[e.nodeName], list):
                 tmp = []
                 tmp.append(root[e.nodeName])
@@ -77,11 +77,11 @@ def is_valid_cc(cc):
     Uses Luhn Algorithm for credit card number validation. http://en.wikipedia.org/wiki/Luhn_algorithm
     """
     try:
-        num = map(int, cc)
+        num = list(map(int, cc))
     except ValueError:
         return False
     else:
-        return not sum(num[::-2] + map(lambda d: sum(divmod(d * 2, 10)), num[-2::-2])) % 10
+        return not sum(num[::-2] + [sum(divmod(d * 2, 10)) for d in num[-2::-2]]) % 10
 
 def is_valid_exp(month, year):
     """
@@ -103,7 +103,7 @@ def get_card_type(cc):
     """
     Gets card type by using card number
     """
-    for k, v in CARD_TYPES.items():
+    for k, v in list(CARD_TYPES.items()):
         if re.match(v, cc):
             return k
 

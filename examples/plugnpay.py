@@ -36,7 +36,7 @@ billing = {
     'email': 'manuel@140.am'
 }
 
-print '-----------------------------'
+print('-----------------------------')
 
 trans = api.capture('1.0', cc_obj, billing)
-print trans
+print(trans)

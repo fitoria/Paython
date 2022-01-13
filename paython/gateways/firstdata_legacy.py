@@ -1,6 +1,6 @@
 import re
 import time
-import urlparse
+import urllib.parse
 import logging
 
 from paython.exceptions import DataValidationError, MissingDataError
@@ -92,7 +92,7 @@ class FirstDataLegacy(XMLGateway):
         # passing fields to bubble up to Base Class
         ssl_config = {'port':'1129', 'key_file':key_file, 'cert_file':cert_file}
         # there is only a live environment, with test credentials & we only need the host for now
-        url = urlparse.urlparse(self.API_URI['live']).netloc.split(':')[0]
+        url = urllib.parse.urlparse(self.API_URI['live']).netloc.split(':')[0]
         # initing the XML gateway
         super(FirstDataLegacy, self).__init__(url, translations=self.REQUEST_FIELDS, debug=debug, special_params=ssl_config)
 
@@ -258,7 +258,7 @@ class FirstDataLegacy(XMLGateway):
         Makes a request using lib.api.XMLGateway.make_request() & move some debugging away from other methods.
         """
         #getting the uri to POST xml to
-        uri = urlparse.urlparse(self.API_URI['live']).path
+        uri = urllib.parse.urlparse(self.API_URI['live']).path
 
         debug_string = " paython.gateways.firstdata_legacy.request() -- Attempting request to: "
         logger.debug(debug_string.center(80, '='))

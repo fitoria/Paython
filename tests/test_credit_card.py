@@ -100,7 +100,7 @@ def test_invalid_cvv():
 @with_setup(setup, teardown)
 def test_valid():
     """test if a credit card number is luhn valid"""
-    for test_cc_type, test_cc_num in TEST_CARDS.items():
+    for test_cc_type, test_cc_num in list(TEST_CARDS.items()):
         # create a credit card object
         credit_card = CreditCard(
                 number = test_cc_num, # valid credit card

@@ -26,7 +26,7 @@ class Gateway(object):
         if hasattr(credit_card, '_exp_yr_style'): # here for gateways that like 2 digit expiration years
             credit_card.exp_year = credit_card.exp_year[-2:]
 
-        for key, value in credit_card.__dict__.items():
+        for key, value in list(credit_card.__dict__.items()):
             if not key.startswith('_'):
                 try:
                     self.set(self.REQUEST_FIELDS[key], value)
@@ -90,7 +90,7 @@ class Gateway(object):
 
         #in line comments on this one
         for optional_var in optionals:
-            exec '%s = %s' % (optional_var, optional_var) # re-assign each option param to itself
+            exec('%s = %s' % (optional_var, optional_var)) # re-assign each option param to itself
             if eval(optional_var): # see if it was passed into the method
                 if optional_var not in self.REQUEST_FIELDS: # make sure we have a translation in the request fields dictionary
                     # & keep the string so we have a meaningful exception
@@ -123,7 +123,7 @@ class Gateway(object):
                     self.RESPONSE_FIELDS[field_mapping[iteration_key]] = item
                 i += 1
         else: # dict settings
-            for key, value in spec_response.items():
+            for key, value in list(spec_response.items()):
                 try:
                     self.RESPONSE_FIELDS[field_mapping[key]] = value
                 except KeyError:

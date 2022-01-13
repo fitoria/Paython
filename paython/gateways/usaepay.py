@@ -1,5 +1,5 @@
 import time
-import urlparse
+import urllib.parse
 import logging
 
 from paython.exceptions import MissingDataError
@@ -294,7 +294,7 @@ class USAePay(PostGateway):
         logger.debug('\n ' + str(response))
 
         #splitting up response into a list so we can map it to Paython generic response
-        new_response = urlparse.parse_qsl(response)
+        new_response = urllib.parse.parse_qsl(response)
         response = dict(new_response)
         approved = (response['UMresult'] == 'A')
 

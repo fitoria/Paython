@@ -5,7 +5,7 @@ import base64
 import decimal
 import requests
 import datetime
-import urlparse
+import urllib.parse
 import logging
 from hashlib import sha1
 from time import gmtime, strftime
@@ -107,7 +107,7 @@ class FirstData(PostGateway):
         if hasattr(credit_card, '_exp_yr_style'): # here for gateways that like 2 digit expiration years
             credit_card.exp_year = credit_card.exp_year[-2:]
 
-        for key, value in credit_card.__dict__.items():
+        for key, value in list(credit_card.__dict__.items()):
             if not key.startswith('_'):
                 try:
                     self.set(self.REQUEST_FIELDS[key], value)
@@ -252,7 +252,7 @@ class FirstData(PostGateway):
                 """FirstData sometimes sends back a http-args not a json argument...ugh.
                 """
                 try:
-                    urlargs = dict(urlparse.parse_qsl(response))
+                    urlargs = dict(urllib.parse.parse_qsl(response))
                     if len(urlargs)==0:
                         raise ValueError("Move to text...")
                     else:

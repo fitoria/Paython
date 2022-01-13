@@ -1,8 +1,8 @@
-import httplib
-import urllib
+import http.client
+import urllib.request, urllib.parse, urllib.error
 import xml.dom.minidom
 
-from utils import parse_xml
+from .utils import parse_xml
 from paython.gateways.core import Gateway
 from paython.exceptions import RequestError, GatewayError, DataValidationError
 
@@ -99,9 +99,9 @@ class XMLGateway(Gateway):
         # checking to see if we have any special params
         if self.special_ssl:
             kwargs = self.special_ssl
-            api = httplib.HTTPSConnection(self.api_host, **kwargs)
+            api = http.client.HTTPSConnection(self.api_host, **kwargs)
         else:
-            api = httplib.HTTPSConnection(self.api_host)
+            api = http.client.HTTPSConnection(self.api_host)
 
         api.connect()
         api.putrequest('POST', api_uri, skip_host=True)
@@ -161,7 +161,7 @@ class GetGateway(Gateway):
         """
         Build the query string to use later (in get)
         """
-        request_query = '?%s' % urllib.urlencode(self.REQUEST_DICT)
+        request_query = '?%s' % urllib.parse.urlencode(self.REQUEST_DICT)
         return request_query
 
     def make_request(self, uri):
@@ -170,7 +170,7 @@ class GetGateway(Gateway):
         """
         try:
             params = self.query_string()
-            request = urllib.urlopen('%s%s' % (uri, params))
+            request = urllib.request.urlopen('%s%s' % (uri, params))
 
             return request.read()
         except:
@@ -195,14 +195,14 @@ class PostGateway(Gateway):
         """
         returns arguments that are going to be sent to the POST (here for debugging)
         """
-        return urllib.urlencode(self.REQUEST_DICT)
+        return urllib.parse.urlencode(self.REQUEST_DICT)
 
     def make_request(self, uri):
         """
         POSTs to url with params (self.REQUEST_DICT) - simple enough... string uri, dict params
         """
         try:
-            request = urllib.urlopen(uri, self.params())
+            request = urllib.request.urlopen(uri, self.params())
             return request.read()
         except:
             raise GatewayError('Error making request to gateway')

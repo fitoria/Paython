@@ -73,11 +73,11 @@ class Stripe(object):
                     "address_state":billing_info.get('state')
                 },
             )
-        except stripe.InvalidRequestError, e:
+        except stripe.InvalidRequestError as e:
             response = {'failure_message':'Invalid Request: %s' % e}
             end = time.time() # done timing it
             response_time = '%0.2f' % (end-start)
-        except stripe.CardError, e:
+        except stripe.CardError as e:
             response = {'failure_message':'Card Error: %s' % e}
             end = time.time() # done timing it
             response_time = '%0.2f' % (end-start)
@@ -102,7 +102,7 @@ class Stripe(object):
         try:
             ch = self.stripe_api.Charge.retrieve(trans_id)
             response = ch.refund(amount=amount)
-        except Exception, e:
+        except Exception as e:
             response = {'failure_message':'Unable to refund: %s' % e}
             end = time.time() # done timing it
             response_time = '%0.2f' % (end - start)
@@ -141,7 +141,7 @@ class Stripe(object):
         # trans type ;)
         new_response['trans_type'] = 'credit' if response.get('amount_refunded') > 0 else 'capture'
 
-        for key in self.RESPONSE_KEYS.keys():
+        for key in list(self.RESPONSE_KEYS.keys()):
             if response.get(key):
                 if key == 'amount':
                     response[key] = '%.2f' % (float(response[key])/float(100))

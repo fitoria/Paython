@@ -1,1 +1,1 @@
-from cc import CreditCard
+from .cc import CreditCard

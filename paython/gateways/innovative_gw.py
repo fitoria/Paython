@@ -1,5 +1,5 @@
 import time
-import urlparse
+import urllib.parse
 import logging
 
 from paython.exceptions import MissingDataError
@@ -254,7 +254,7 @@ class InnovativeGW(PostGateway):
         logger.debug(debug_string.center(80, '='))
         logger.debug("\n %s" % response)
 
-        new_response = urlparse.parse_qsl(response)
+        new_response = urllib.parse.parse_qsl(response)
         response = dict(new_response)
         if 'approval' in response:
             approved = True

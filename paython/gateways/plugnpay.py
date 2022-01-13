@@ -1,5 +1,5 @@
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import logging
 
 from paython.exceptions import MissingDataError
@@ -579,10 +579,10 @@ class PlugnPay(PostGateway):
         response = {}
         for field in raw_response:
             t = field.split('=')
-            response[urllib.unquote(t[0])] = urllib.unquote(t[1]).strip('|').strip()
+            response[urllib.parse.unquote(t[0])] = urllib.parse.unquote(t[1]).strip('|').strip()
 
         # map AVS code to string based on `card-type`
-        if response.has_key('avs-code'):
+        if 'avs-code' in response:
             if (response.get('card-type') in self.AVS_RESPONSE_KEYS and
                 response['avs-code'] in self.AVS_RESPONSE_KEYS[response['card-type']]
             ):
@@ -595,7 +595,7 @@ class PlugnPay(PostGateway):
             response['sresp-msg'] = self.SIMPLE_STATUS_RESPONSE_KEYS[response['sresp']]
 
         # exact response code description by Merchant Processors
-        if response.has_key('resp-code') and response['resp-code'] in self.STATUS_RESPONSE_KEYS:
+        if 'resp-code' in response and response['resp-code'] in self.STATUS_RESPONSE_KEYS:
             response['resp-code-msg'] = self.STATUS_RESPONSE_KEYS[response['resp-code']]
 
         # parse Transaction status
