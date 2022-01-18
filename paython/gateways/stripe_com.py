@@ -73,11 +73,11 @@ class Stripe(object):
                     "address_state":billing_info.get('state')
                 },
             )
-        except stripe.InvalidRequestError as e:
+        except stripe.error.InvalidRequestError as e:
             response = {'failure_message':'Invalid Request: %s' % e}
             end = time.time() # done timing it
             response_time = '%0.2f' % (end-start)
-        except stripe.CardError as e:
+        except stripe.error.CardError as e:
             response = {'failure_message':'Card Error: %s' % e}
             end = time.time() # done timing it
             response_time = '%0.2f' % (end-start)
