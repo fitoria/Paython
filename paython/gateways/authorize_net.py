@@ -331,6 +331,7 @@ class AuthorizeNet(PostGateway):
         """
         On Specific Gateway due differences in response from gateway
         """
+        response = response.decode('utf-8')
         debug_string = " paython.gateways.authorize_net.parse() -- Raw response: "
         logger.debug(debug_string.center(80, '='))
         logger.debug("\n %s" % response)

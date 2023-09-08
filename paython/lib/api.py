@@ -195,7 +195,7 @@ class PostGateway(Gateway):
         """
         returns arguments that are going to be sent to the POST (here for debugging)
         """
-        return urllib.parse.urlencode(self.REQUEST_DICT)
+        return urllib.parse.urlencode(self.REQUEST_DICT).encode('utf-8')
 
     def make_request(self, uri):
         """
