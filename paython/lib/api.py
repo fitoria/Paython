@@ -1,6 +1,8 @@
+import json
 import http.client
 import urllib.request, urllib.parse, urllib.error
 import xml.dom.minidom
+from collections import OrderedDict
 
 from .utils import parse_xml
 from paython.gateways.core import Gateway
@@ -204,5 +206,40 @@ class PostGateway(Gateway):
         try:
             request = urllib.request.urlopen(uri, self.params())
             return request.read()
+        except:
+            raise GatewayError('Error making request to gateway')
+
+
+class JsonGateway(PostGateway):
+    REQUEST_DICT = OrderedDict() 
+    debug = False
+
+    def __init__(self, translations, debug):
+        """core json gateway class"""
+        super(PostGateway, self).__init__(set_method=self.set, translations=translations, debug=debug)
+        self.debug = debug
+
+    def set(self, key, value):
+        """
+        Setups request dict for Json 
+        """
+        self.REQUEST_DICT[key] = value
+
+    def params(self):
+        """
+        returns arguments that are going to be sent to the POST (here for debugging)
+        """
+        return json.dumps(self.REQUEST_DICT).encode('utf-8') 
+
+    def make_request(self, uri):
+        """
+        POSTs to url with params (self.REQUEST_DICT) - simple enough... string uri, dict params
+        """
+        headers = {'Content-Type': 'application/json'}
+        req = urllib.request.Request(uri, data=self.params(), headers=headers, method='POST')
+
+        try:
+            with urllib.request.urlopen(req) as response:
+                return response.read()
         except:
             raise GatewayError('Error making request to gateway')
