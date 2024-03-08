@@ -294,7 +294,8 @@ class AuthorizeNetNew(JsonGateway):
         response, response_time = self.request()
         return self.parse(response, response_time)
 
-    def capture(self, amount, credit_card=None, billing_info=None, shipping_info=None):
+    def capture(self, amount, credit_card=None, billing_info=None, 
+                shipping_info=None, line_item={}):
         """
         Sends transaction for capture (same day settlement) based on amount.
         """
@@ -302,8 +303,15 @@ class AuthorizeNetNew(JsonGateway):
 
         self.REQUEST_DICT['transactionRequest']['transactionType'] = "authCaptureTransaction" 
         self.REQUEST_DICT['transactionRequest']['amount'] = str(amount) 
-
-        # validating or building up request
+        #"lineItems": {
+        #        "lineItem": {
+        #            "itemId": "1",
+        #            "name": "vase",
+        #            "description": "Cannes logo",
+        #            "quantity": "18",
+        #            "unitPrice": "45.00"
+        #        }
+                # validating or building up request
         if not credit_card:
             debug_string = "paython.gateways.authorize_net.auth()  -- No CreditCard object present. You passed in %s " % (credit_card)
             logger.debug(debug_string)
@@ -311,6 +319,10 @@ class AuthorizeNetNew(JsonGateway):
             raise MissingDataError('You did not pass a CreditCard object into the auth method')
         else:
             self.use_credit_card(credit_card)
+
+        if line_item:
+            line_items = {'lineItem': line_item}
+            self.REQUEST_DICT['transactionRequest']['lineItems'] = line_items
 
         if billing_info:
             self.set_billing_info(**billing_info)
@@ -423,9 +435,9 @@ class AuthorizeNetNew(JsonGateway):
         self.RESPONSE_FIELDS['messages'] = spec_response['messages']
         try:
             self.RESPONSE_FIELDS['response'] = spec_response['transactionResponse']
+            self.RESPONSE_FIELDS['refId'] = spec_response['refId']
         except:
             pass
-        self.RESPONSE_FIELDS['refId'] = spec_response['refId']
         self.RESPONSE_FIELDS.update(spec_response)
         return self.RESPONSE_FIELDS
 
