@@ -9,100 +9,6 @@ from paython.lib.api import JsonGateway
 logger = logging.getLogger(__name__)
 
 
-# {
-#     "createTransactionRequest": {
-#         "merchantAuthentication": {
-#             "name": "5KP3u95bQpv",
-#             "transactionKey": "346HZ32z3fP4hTG2"
-#         },
-#         "refId": "123456",
-#         "transactionRequest": {
-#             "transactionType": "authOnlyTransaction",
-#             "amount": "5",
-#             "payment": {
-#                 "creditCard": {
-#                     "cardNumber": "5424000000000015",
-#                     "expirationDate": "2025-12",
-#                     "cardCode": "999"
-#                 }
-#             },
-#             "lineItems": {
-#                 "lineItem": {
-#                     "itemId": "1",
-#                     "name": "vase",
-#                     "description": "Cannes logo",
-#                     "quantity": "18",
-#                     "unitPrice": "45.00"
-#                 }
-#             },
-#             "tax": {
-#                 "amount": "4.26",
-#                 "name": "level2 tax name",
-#                 "description": "level2 tax"
-#             },
-#             "duty": {
-#                 "amount": "8.55",
-#                 "name": "duty name",
-#                 "description": "duty description"
-#             },
-#             "shipping": {
-#                 "amount": "4.26",
-#                 "name": "level2 tax name",
-#                 "description": "level2 tax"
-#             },
-#             "poNumber": "456654",
-#             "customer": {
-#                 "id": "99999456654"
-#             },
-#             "billTo": {
-#                 "firstName": "Ellen",
-#                 "lastName": "Johnson",
-#                 "company": "Souveniropolis",
-#                 "address": "14 Main Street",
-#                 "city": "Pecan Springs",
-#                 "state": "TX",
-#                 "zip": "44628",
-#                 "country": "US"
-#             },
-#             "shipTo": {
-#                 "firstName": "China",
-#                 "lastName": "Bayles",
-#                 "company": "Thyme for Tea",
-#                 "address": "12 Main Street",
-#                 "city": "Pecan Springs",
-#                 "state": "TX",
-#                 "zip": "44628",
-#                 "country": "US"
-#             },
-#             "customerIP": "192.168.1.1",
-#             "userFields": {
-#                 "userField": [
-#                     {
-#                         "name": "MerchantDefinedFieldName1",
-#                         "value": "MerchantDefinedFieldValue1"
-#                     },
-#                     {
-#                         "name": "favorite_color",
-#                         "value": "blue"
-#                     }
-#                 ]
-#             },
-# 	    "processingOptions": {
-#              "isSubsequentAuth": "true"
-#             },
-# 	     "subsequentAuthInformation": {
-#              "originalNetworkTransId": "123456789NNNH",
-#              "originalAuthAmount": "45.00",
-#              "reason": "resubmission"
-#             },
-#             "authorizationIndicatorType": {
-#             "authorizationIndicator": "pre"
-#           }
-#         }
-#     }
-# }
-
-
 class AuthorizeNetNew(JsonGateway):
     """New Authorize.net version with request.api endpoint"""
 
@@ -303,7 +209,14 @@ class AuthorizeNetNew(JsonGateway):
         response, response_time = self.request()
         return self.parse(response, response_time)
 
-    def capture(self, amount, credit_card=None, billing_info=None, shipping_info=None):
+    def capture(
+        self,
+        amount,
+        credit_card=None,
+        billing_info=None,
+        shipping_info=None,
+        line_item={},
+    ):
         """
         Sends transaction for capture (same day settlement) based on amount.
         """
@@ -313,8 +226,6 @@ class AuthorizeNetNew(JsonGateway):
             "transactionType"
         ] = "authCaptureTransaction"
         self.REQUEST_DICT["transactionRequest"]["amount"] = str(amount)
-
-        # validating or building up request
         if not credit_card:
             debug_string = (
                 "paython.gateways.authorize_net.auth()  -- No CreditCard object present. You passed in %s "
@@ -327,6 +238,10 @@ class AuthorizeNetNew(JsonGateway):
             )
         else:
             self.use_credit_card(credit_card)
+
+        if line_item:
+            line_items = {"lineItem": line_item}
+            self.REQUEST_DICT["transactionRequest"]["lineItems"] = line_items
 
         if billing_info:
             self.set_billing_info(**billing_info)
@@ -462,9 +377,9 @@ class AuthorizeNetNew(JsonGateway):
         self.RESPONSE_FIELDS["messages"] = spec_response["messages"]
         try:
             self.RESPONSE_FIELDS["response"] = spec_response["transactionResponse"]
+            self.RESPONSE_FIELDS["refId"] = spec_response["refId"]
         except:
             pass
-        self.RESPONSE_FIELDS["refId"] = spec_response["refId"]
         self.RESPONSE_FIELDS.update(spec_response)
         return self.RESPONSE_FIELDS
 
