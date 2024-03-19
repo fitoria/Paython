@@ -7,55 +7,57 @@ from paython.lib.api import PostGateway
 
 logger = logging.getLogger(__name__)
 
+
 class InnovativeGW(PostGateway):
     """TODO needs docstring"""
-    VERSION = 'WebCharge_v5.06'
+
+    VERSION = "WebCharge_v5.06"
 
     # This is how we determine whether or not we allow 'test' as an init param
     API_URI = {
-        'live': 'https://transactions.innovativegateway.com/servlet/com.gateway.aai.Aai'
+        "live": "https://transactions.innovativegateway.com/servlet/com.gateway.aai.Aai"
     }
 
     # This is how we translate the common Paython fields to Gateway specific fields
     # it goes like this: 'paython_key' ==> 'gateway_specific_parameter'
     REQUEST_FIELDS = {
-        #contact
-        'full_name': 'ccname',
-        'first_name': None,
-        'last_name': None,
-        'email': 'email',
-        'phone': 'bphone',
-        #billing
-        'address': 'baddress',
-        'address2': 'baddress1',
-        'city': 'bcity',
-        'state': 'bstate',
-        'zipcode': 'bzip',
-        'country': 'bcountry',
-        'ip': None,
-        #card
-        'number': 'ccnumber',
-        'exp_date': None,
-        'exp_month': 'month',
-        'exp_year': 'year',
-        'verification_value': 'ccidentifier1',
-        'card_type': 'cardtype',
-        #shipping
-        'ship_full_name': None,
-        'ship_first_name': None,
-        'ship_last_name': None,
-        'ship_to_co': None,
-        'ship_address': 'saddress1',
-        'ship_address2': 'saddress',
-        'ship_city': 'scity',
-        'ship_state': 'sstate',
-        'ship_zipcode': 'szip',
-        'ship_country': 'scountry',
-        #transation
-        'amount': 'fulltotal',
-        'trans_type': 'trantype',
-        'trans_id': 'trans_id',
-        'alt_trans_id': 'reference',
+        # contact
+        "full_name": "ccname",
+        "first_name": None,
+        "last_name": None,
+        "email": "email",
+        "phone": "bphone",
+        # billing
+        "address": "baddress",
+        "address2": "baddress1",
+        "city": "bcity",
+        "state": "bstate",
+        "zipcode": "bzip",
+        "country": "bcountry",
+        "ip": None,
+        # card
+        "number": "ccnumber",
+        "exp_date": None,
+        "exp_month": "month",
+        "exp_year": "year",
+        "verification_value": "ccidentifier1",
+        "card_type": "cardtype",
+        # shipping
+        "ship_full_name": None,
+        "ship_first_name": None,
+        "ship_last_name": None,
+        "ship_to_co": None,
+        "ship_address": "saddress1",
+        "ship_address2": "saddress",
+        "ship_city": "scity",
+        "ship_state": "sstate",
+        "ship_zipcode": "szip",
+        "ship_country": "scountry",
+        # transation
+        "amount": "fulltotal",
+        "trans_type": "trantype",
+        "trans_id": "trans_id",
+        "alt_trans_id": "reference",
     }
 
     # Response Code: 1 = Approved, 2 = Declined, 3 = Error, 4 = Held for Review
@@ -68,15 +70,15 @@ class InnovativeGW(PostGateway):
     # response index keys to map the value to its proper dictionary key
     # it goes like this: 'gateway_specific_parameter' ==> 'paython_key'
     RESPONSE_KEYS = {
-        'error':'response_text',
-        'messageid':'auth_code',
-        'avs':'avs_response',
-        'anatransid':'trans_id',
-        'fulltotal':'amount',
-        'trantype':'trans_type',
-        'approval':'alt_trans_id', # aka "reference" in intuit land
-        'ordernumber':'alt_trans_id2',
-        'fulltotal':'amount',
+        "error": "response_text",
+        "messageid": "auth_code",
+        "avs": "avs_response",
+        "anatransid": "trans_id",
+        "fulltotal": "amount",
+        "trantype": "trans_type",
+        "approval": "alt_trans_id",  # aka "reference" in intuit land
+        "ordernumber": "alt_trans_id2",
+        "fulltotal": "amount",
         #'38':'cvv_response', <-- way of finding out if verification_value is invalid
         #'2':'response_reason_code', <-- mostly for reporting
         #'0':'response_code', <-- mostly for reporting
@@ -85,15 +87,17 @@ class InnovativeGW(PostGateway):
     debug = False
     test = False
 
-    def __init__(self, username='gatewaytest', password='GateTest2002', debug=False):
+    def __init__(self, username="gatewaytest", password="GateTest2002", debug=False):
         """
         setting up object so we can run 3 different ways (live, debug, live+debug no test endpoint available)
         """
-        super(InnovativeGW, self).set('username', username)
-        super(InnovativeGW, self).set('pw', password)
+        super(InnovativeGW, self).set("username", username)
+        super(InnovativeGW, self).set("pw", password)
 
         # passing fields to bubble up to Base Class
-        super(InnovativeGW, self).__init__(translations=self.REQUEST_FIELDS, debug=debug)
+        super(InnovativeGW, self).__init__(
+            translations=self.REQUEST_FIELDS, debug=debug
+        )
 
         if debug:
             self.debug = True
@@ -102,30 +106,37 @@ class InnovativeGW(PostGateway):
         """
         standard setup, used for charges
         """
-        super(InnovativeGW, self).set('target_app', self.VERSION)
-        super(InnovativeGW, self).set('response_mode', 'simple')
-        super(InnovativeGW, self).set('response_fmt', 'url_encoded')
-        super(InnovativeGW, self).set('upg_auth', 'zxcvlkjh')
+        super(InnovativeGW, self).set("target_app", self.VERSION)
+        super(InnovativeGW, self).set("response_mode", "simple")
+        super(InnovativeGW, self).set("response_fmt", "url_encoded")
+        super(InnovativeGW, self).set("upg_auth", "zxcvlkjh")
 
-        debug_string = " paython.gateways.innovative_gw.charge_setup() Just set up for a charge "
-        logger.debug(debug_string.center(80, '='))
+        debug_string = (
+            " paython.gateways.innovative_gw.charge_setup() Just set up for a charge "
+        )
+        logger.debug(debug_string.center(80, "="))
 
     def auth(self, amount, credit_card=None, billing_info=None, shipping_info=None):
         """
         Sends charge for authorization based on amount
         """
-        #set up transaction
-        self.charge_setup() # considering turning this into a decorator?
+        # set up transaction
+        self.charge_setup()  # considering turning this into a decorator?
 
-        #setting transaction data
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['amount'], amount)
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['trans_type'], 'preauth')
+        # setting transaction data
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["amount"], amount)
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["trans_type"], "preauth")
 
         # validating or building up request
         if not credit_card:
-            logger.debug("paython.gateways.innovative_gw.auth()  -- No CreditCard object present. You passed in %s " % (credit_card))
+            logger.debug(
+                "paython.gateways.innovative_gw.auth()  -- No CreditCard object present. You passed in %s "
+                % (credit_card)
+            )
 
-            raise MissingDataError('You did not pass a CreditCard object into the auth method')
+            raise MissingDataError(
+                "You did not pass a CreditCard object into the auth method"
+            )
         else:
             super(InnovativeGW, self).use_credit_card(credit_card)
 
@@ -143,15 +154,17 @@ class InnovativeGW(PostGateway):
         """
         Sends prior authorization to be settled based on amount & trans_id PRIOR_AUTH_CAPTURE
         """
-        #set up transaction
-        self.charge_setup() # considering turning this into a decorator?
+        # set up transaction
+        self.charge_setup()  # considering turning this into a decorator?
 
-        #setting transaction data
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['trans_type'], 'postauth')
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['amount'], amount)
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['trans_id'], trans_id)
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['alt_trans_id'], ref)
-        super(InnovativeGW, self).set('authamount', amount) #hardcoded because of uniqueness to gateway
+        # setting transaction data
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["trans_type"], "postauth")
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["amount"], amount)
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["trans_id"], trans_id)
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["alt_trans_id"], ref)
+        super(InnovativeGW, self).set(
+            "authamount", amount
+        )  # hardcoded because of uniqueness to gateway
 
         # send transaction to gateway!
         response, response_time = self.request()
@@ -161,18 +174,23 @@ class InnovativeGW(PostGateway):
         """
         Sends transaction for capture (same day settlement) based on amount.
         """
-        #set up transaction
-        self.charge_setup() # considering turning this into a decorator?
+        # set up transaction
+        self.charge_setup()  # considering turning this into a decorator?
 
-        #setting transaction data
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['amount'], amount)
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['trans_type'], 'sale')
+        # setting transaction data
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["amount"], amount)
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["trans_type"], "sale")
 
         # validating or building up request
         if not credit_card:
-            logger.debug("paython.gateways.innovative_gw.capture()  -- No CreditCard object present. You passed in %s " % (credit_card))
+            logger.debug(
+                "paython.gateways.innovative_gw.capture()  -- No CreditCard object present. You passed in %s "
+                % (credit_card)
+            )
 
-            raise MissingDataError('You did not pass a CreditCard object into the auth method')
+            raise MissingDataError(
+                "You did not pass a CreditCard object into the auth method"
+            )
         else:
             super(InnovativeGW, self).use_credit_card(credit_card)
 
@@ -190,14 +208,16 @@ class InnovativeGW(PostGateway):
         """
         Sends a transaction to be voided (in full)
         """
-        #set up transaction
-        self.charge_setup() # considering turning this into a decorator?
+        # set up transaction
+        self.charge_setup()  # considering turning this into a decorator?
 
-        #setting transaction data
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['trans_type'], 'void')
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['trans_id'], trans_id)
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['alt_trans_id'], ref)
-        super(InnovativeGW, self).set('ordernumber', ordernumber) #hardcoded because of uniqueness to gateway
+        # setting transaction data
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["trans_type"], "void")
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["trans_id"], trans_id)
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["alt_trans_id"], ref)
+        super(InnovativeGW, self).set(
+            "ordernumber", ordernumber
+        )  # hardcoded because of uniqueness to gateway
 
         # send transaction to gateway!
         response, response_time = self.request()
@@ -207,17 +227,19 @@ class InnovativeGW(PostGateway):
         """
         Sends a transaction to be refunded (partially or fully)
         """
-        #set up transaction
-        self.charge_setup() # considering turning this into a decorator?
+        # set up transaction
+        self.charge_setup()  # considering turning this into a decorator?
 
-        #setting transaction data
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['trans_type'], 'credit')
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['trans_id'], trans_id)
-        super(InnovativeGW, self).set(self.REQUEST_FIELDS['alt_trans_id'], ref)
-        super(InnovativeGW, self).set('ordernumber', ordernumber) #hardcoded because of uniqueness to gateway
+        # setting transaction data
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["trans_type"], "credit")
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["trans_id"], trans_id)
+        super(InnovativeGW, self).set(self.REQUEST_FIELDS["alt_trans_id"], ref)
+        super(InnovativeGW, self).set(
+            "ordernumber", ordernumber
+        )  # hardcoded because of uniqueness to gateway
 
-        if amount: #check to see if we should send an amount
-            super(InnovativeGW, self).set(self.REQUEST_FIELDS['amount'], amount)
+        if amount:  # check to see if we should send an amount
+            super(InnovativeGW, self).set(self.REQUEST_FIELDS["amount"], amount)
 
         # send transaction to gateway!
         response, response_time = self.request()
@@ -228,21 +250,27 @@ class InnovativeGW(PostGateway):
         Makes a request using lib.api.GetGateway.make_request() & move some debugging away from other methods.
         """
         # there is only a live environment, with test credentials
-        url = self.API_URI['live']
+        url = self.API_URI["live"]
 
-        debug_string = " paython.gateways.innovative_gw.request() -- Attempting request to: "
-        logger.debug(debug_string.center(80, '='))
-        logger.debug("\n %s with params: %s" %
-                     (url, super(InnovativeGW, self).params()))
+        debug_string = (
+            " paython.gateways.innovative_gw.request() -- Attempting request to: "
+        )
+        logger.debug(debug_string.center(80, "="))
+        logger.debug(
+            "\n %s with params: %s" % (url, super(InnovativeGW, self).params())
+        )
 
         # make the request
-        start = time.time() # timing it
+        start = time.time()  # timing it
         response = super(InnovativeGW, self).make_request(url)
-        end = time.time() # done timing it
-        response_time = '%0.2f' % (end - start)
+        end = time.time()  # done timing it
+        response_time = "%0.2f" % (end - start)
 
-        debug_string = " paython.gateways.innovative_gw.request()  -- Request completed in %ss " % response_time
-        logger.debug(debug_string.center(80, '='))
+        debug_string = (
+            " paython.gateways.innovative_gw.request()  -- Request completed in %ss "
+            % response_time
+        )
+        logger.debug(debug_string.center(80, "="))
 
         return response, response_time
 
@@ -251,19 +279,23 @@ class InnovativeGW(PostGateway):
         On Specific Gateway due differences in response from gateway
         """
         debug_string = " paython.gateways.innovative_gw.parse() -- Raw response: "
-        logger.debug(debug_string.center(80, '='))
+        logger.debug(debug_string.center(80, "="))
         logger.debug("\n %s" % response)
 
         new_response = urllib.parse.parse_qsl(response)
         response = dict(new_response)
-        if 'approval' in response:
+        if "approval" in response:
             approved = True
         else:
             approved = False
-            response['approval'] = 'decline' # there because we have a translation key called "approval" - open to ideas here...
+            response["approval"] = (
+                "decline"  # there because we have a translation key called "approval" - open to ideas here...
+            )
 
         debug_string = " paython.gateways.innovative_gw.parse() -- Response as dict: "
-        logger.debug(debug_string.center(80, '='))
-        logger.debug('\n%s' % response)
+        logger.debug(debug_string.center(80, "="))
+        logger.debug("\n%s" % response)
 
-        return super(InnovativeGW, self).standardize(response, self.RESPONSE_KEYS, response_time, approved)
+        return super(InnovativeGW, self).standardize(
+            response, self.RESPONSE_KEYS, response_time, approved
+        )

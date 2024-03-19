@@ -7,8 +7,9 @@ from paython.lib.api import PostGateway
 
 logger = logging.getLogger(__name__)
 
+
 class USAePay(PostGateway):
-    """ usaepay.com Payment Gatway Interface
+    """usaepay.com Payment Gatway Interface
 
     Based on the CGI Transaction Gateway API v2.17.1
 
@@ -26,43 +27,43 @@ class USAePay(PostGateway):
 
     # This is how we translate the common Paython fields to Gateway specific fields
     REQUEST_FIELDS = {
-        #contact
-        'full_name' : 'UMname',
-        'first_name': None,
-        'last_name': None,
-        'email': 'UMcustemail',
-        'phone': 'UMbillphone',
-        #billing
-        'address': 'UMbillstreet',
-        'address2': 'UMbillstreet2',
-        'city': 'UMbillcity',
-        'state': 'UMbillstate',
-        'zipcode': 'UMbillzip',
-        'country': 'UMbillcountry',
-        'ip': 'UMip',
-        #card
-        'number': 'UMcard',
-        'exp_date': 'UMexpir',
-        'exp_month': None,
-        'exp_year': None,
-        'verification_value': 'UMcvv2',
-        'card_type': None,
-        #shipping
-        'ship_full_name': None,
-        'ship_first_name': 'UMshipfname',
-        'ship_last_name': 'UMshiplname',
-        'ship_to_co': 'UMshipcompany',
-        'ship_address': 'UMshipstreet',
-        'ship_address2': 'UMshipstreet2',
-        'ship_city': 'UMshipcity',
-        'ship_state': 'UMshipstate',
-        'ship_zipcode': 'UMshipzip',
-        'ship_country': 'UMshipcountry',
-        #transation
-        'amount': 'UMamount',
-        'trans_type': 'UMcommand',
-        'trans_id': 'UMrefNum',
-        'alt_trans_id': None,
+        # contact
+        "full_name": "UMname",
+        "first_name": None,
+        "last_name": None,
+        "email": "UMcustemail",
+        "phone": "UMbillphone",
+        # billing
+        "address": "UMbillstreet",
+        "address2": "UMbillstreet2",
+        "city": "UMbillcity",
+        "state": "UMbillstate",
+        "zipcode": "UMbillzip",
+        "country": "UMbillcountry",
+        "ip": "UMip",
+        # card
+        "number": "UMcard",
+        "exp_date": "UMexpir",
+        "exp_month": None,
+        "exp_year": None,
+        "verification_value": "UMcvv2",
+        "card_type": None,
+        # shipping
+        "ship_full_name": None,
+        "ship_first_name": "UMshipfname",
+        "ship_last_name": "UMshiplname",
+        "ship_to_co": "UMshipcompany",
+        "ship_address": "UMshipstreet",
+        "ship_address2": "UMshipstreet2",
+        "ship_city": "UMshipcity",
+        "ship_state": "UMshipstate",
+        "ship_zipcode": "UMshipzip",
+        "ship_country": "UMshipcountry",
+        # transation
+        "amount": "UMamount",
+        "trans_type": "UMcommand",
+        "trans_id": "UMrefNum",
+        "alt_trans_id": None,
     }
 
     # Response Code: 1 = Approved, 2 = Declined, 3 = Error, 4 = Held for Review
@@ -71,14 +72,14 @@ class USAePay(PostGateway):
     # AVS Responses (cont'd): Y = Address (Street) and five digit ZIP match, Z = Five digit ZIP matches, Address (Street) does not
     # response index keys to map the value to its proper dictionary key
     RESPONSE_KEYS = {
-        'UMresult' :         'response_code',
-        'UMerror' :          'response_text',
-        'UMauthCode' :       'auth_code',
-        'UMavsResult' :      'avs_response',
-        'UMrefNum' :         'trans_id',
-        'UMauthAmount' :     'amount',
-        'UMcvv2ResultCode' : 'cvv_response',
-        'UMavsResult' :      'avs_response_text',
+        "UMresult": "response_code",
+        "UMerror": "response_text",
+        "UMauthCode": "auth_code",
+        "UMavsResult": "avs_response",
+        "UMrefNum": "trans_id",
+        "UMauthAmount": "amount",
+        "UMcvv2ResultCode": "cvv_response",
+        "UMavsResult": "avs_response_text",
         #'n/a' :              'response_reason_code',
         #'n/a' :              'trans_type',
         #'n/a' :              'alt_trans_id',
@@ -86,56 +87,69 @@ class USAePay(PostGateway):
         #'n/a' :              'fraud_level',
     }
 
-    def __init__(self, username='test', password='testpassword', debug=False, test=False):
+    def __init__(
+        self, username="test", password="testpassword", debug=False, test=False
+    ):
         """
         setting up object so we can run 4 different ways (live, debug, test & debug+test)
         """
         # passing fields to bubble up to Base Class
         super(USAePay, self).__init__(translations=self.REQUEST_FIELDS, debug=debug)
 
-        self.set('UMkey', username)
-        #self.set('UM', password)
+        self.set("UMkey", username)
+        # self.set('UM', password)
 
         self.API_URI = {
-                        False : 'https://www.usaepay.com/gate',
-                        True :  'https://sandbox.usaepay.com/gate'
-                       }
+            False: "https://www.usaepay.com/gate",
+            True: "https://sandbox.usaepay.com/gate",
+        }
 
         self.test = test
         if test:
-            debug_string = self._get_debug_str_base() + ".__init__() -- You're in test mode (& debug, obviously) "
-            logger.debug(debug_string.center(80, '='))
+            debug_string = (
+                self._get_debug_str_base()
+                + ".__init__() -- You're in test mode (& debug, obviously) "
+            )
+            logger.debug(debug_string.center(80, "="))
 
     def _get_debug_str_base(self):
-        return ' ' + __name__ + '.' + self.__class__.__name__
+        return " " + __name__ + "." + self.__class__.__name__
 
     def charge_setup(self):
         """
         standard setup, used for charges
         """
-        #self.set('x_delim_data', 'TRUE')
-        #self.set('x_delim_char', self.DELIMITER)
-        #self.set('x_version', self.VERSION)
-        debug_string = self._get_debug_str_base() + '.charge_setup() Just set up for a charge '
-        logger.debug(debug_string.center(80, '='))
+        # self.set('x_delim_data', 'TRUE')
+        # self.set('x_delim_char', self.DELIMITER)
+        # self.set('x_version', self.VERSION)
+        debug_string = (
+            self._get_debug_str_base() + ".charge_setup() Just set up for a charge "
+        )
+        logger.debug(debug_string.center(80, "="))
 
     def auth(self, amount, credit_card=None, billing_info=None, shipping_info=None):
         """
         Sends charge for authorization based on amount
         """
-        #set up transaction
+        # set up transaction
         self.charge_setup()
 
-        #setting transaction data
-        self.set(self.REQUEST_FIELDS['amount'], amount)
-        self.set(self.REQUEST_FIELDS['trans_type'], 'cc:authonly')
+        # setting transaction data
+        self.set(self.REQUEST_FIELDS["amount"], amount)
+        self.set(self.REQUEST_FIELDS["trans_type"], "cc:authonly")
 
         # validating or building up request
         if not credit_card:
-            debug_string = self._get_debug_str_base() + '.auth()  -- No CreditCard object present. You passed in %s ' % (credit_card)
+            debug_string = (
+                self._get_debug_str_base()
+                + ".auth()  -- No CreditCard object present. You passed in %s "
+                % (credit_card)
+            )
             logger.debug(debug_string)
 
-            raise MissingDataError('You did not pass a CreditCard object into the auth method')
+            raise MissingDataError(
+                "You did not pass a CreditCard object into the auth method"
+            )
         else:
             self.use_credit_card(credit_card)
 
@@ -153,13 +167,13 @@ class USAePay(PostGateway):
         """
         Sends prior authorization to be settled based on amount & trans_id
         """
-        #set up transaction
-        self.charge_setup() 
+        # set up transaction
+        self.charge_setup()
 
-        #setting transaction data
-        self.set(self.REQUEST_FIELDS['trans_type'], 'cc:capture')
-        self.set(self.REQUEST_FIELDS['amount'], amount)
-        self.set(self.REQUEST_FIELDS['trans_id'], trans_id)
+        # setting transaction data
+        self.set(self.REQUEST_FIELDS["trans_type"], "cc:capture")
+        self.set(self.REQUEST_FIELDS["amount"], amount)
+        self.set(self.REQUEST_FIELDS["trans_id"], trans_id)
 
         # send transaction to gateway!
         response, response_time = self.request()
@@ -169,13 +183,13 @@ class USAePay(PostGateway):
         """
         Adjust an existing (unsettled) sale.  Adjust the amount up or down, etc.
         """
-        #set up transaction
-        self.charge_setup() 
+        # set up transaction
+        self.charge_setup()
 
-        #setting transaction data
-        self.set(self.REQUEST_FIELDS['trans_type'], 'cc:adjust')
-        self.set(self.REQUEST_FIELDS['amount'], amount)
-        self.set(self.REQUEST_FIELDS['trans_id'], trans_id)
+        # setting transaction data
+        self.set(self.REQUEST_FIELDS["trans_type"], "cc:adjust")
+        self.set(self.REQUEST_FIELDS["amount"], amount)
+        self.set(self.REQUEST_FIELDS["trans_id"], trans_id)
 
         # send transaction to gateway!
         response, response_time = self.request()
@@ -185,19 +199,25 @@ class USAePay(PostGateway):
         """
         Sends transaction for capture (same day settlement) based on amount.
         """
-        #set up transaction
+        # set up transaction
         self.charge_setup()
 
-        #setting transaction data
-        self.set(self.REQUEST_FIELDS['amount'], amount)
-        self.set(self.REQUEST_FIELDS['trans_type'], 'cc:sale')
+        # setting transaction data
+        self.set(self.REQUEST_FIELDS["amount"], amount)
+        self.set(self.REQUEST_FIELDS["trans_type"], "cc:sale")
 
         # validating or building up request
         if not credit_card:
-            debug_string = self._get_debug_str_base() + 'capture()  -- No CreditCard object present. You passed in ' + str(credit_card)
+            debug_string = (
+                self._get_debug_str_base()
+                + "capture()  -- No CreditCard object present. You passed in "
+                + str(credit_card)
+            )
             logger.debug(debug_string)
 
-            raise MissingDataError('You did not pass a CreditCard object into the auth method')
+            raise MissingDataError(
+                "You did not pass a CreditCard object into the auth method"
+            )
         else:
             self.use_credit_card(credit_card)
 
@@ -215,12 +235,12 @@ class USAePay(PostGateway):
         """
         Sends a transaction to be voided (in full)
         """
-        #set up transaction
+        # set up transaction
         self.charge_setup()
 
-        #setting transaction data
-        self.set(self.REQUEST_FIELDS['trans_type'], 'void')
-        self.set(self.REQUEST_FIELDS['trans_id'], trans_id)
+        # setting transaction data
+        self.set(self.REQUEST_FIELDS["trans_type"], "void")
+        self.set(self.REQUEST_FIELDS["trans_id"], trans_id)
 
         # send transaction to gateway
         response, response_time = self.request()
@@ -230,16 +250,16 @@ class USAePay(PostGateway):
         """
         Sends a transaction to be refunded (partially or fully)
         """
-        #set up transaction
+        # set up transaction
         self.charge_setup()
 
-        #setting transaction data
-        self.set(self.REQUEST_FIELDS['trans_type'], 'refund')
-        self.set(self.REQUEST_FIELDS['trans_id'], trans_id)
-        self.set(self.REQUEST_FIELDS['number'], credit_card.number)
+        # setting transaction data
+        self.set(self.REQUEST_FIELDS["trans_type"], "refund")
+        self.set(self.REQUEST_FIELDS["trans_id"], trans_id)
+        self.set(self.REQUEST_FIELDS["number"], credit_card.number)
 
-        if amount: #check to see if we should send an amount
-            self.set(self.REQUEST_FIELDS['amount'], amount)
+        if amount:  # check to see if we should send an amount
+            self.set(self.REQUEST_FIELDS["amount"], amount)
 
         # send transaction to gateway
         response, response_time = self.request()
@@ -249,15 +269,15 @@ class USAePay(PostGateway):
         """
         Refund money to a credit card, not linked to a previous transaction
         """
-        #set up transaction
+        # set up transaction
         self.charge_setup()
 
-        #setting transaction data
-        self.set(self.REQUEST_FIELDS['trans_type'], 'cc:credit')
-        self.set(self.REQUEST_FIELDS['number'], credit_card.number)
+        # setting transaction data
+        self.set(self.REQUEST_FIELDS["trans_type"], "cc:credit")
+        self.set(self.REQUEST_FIELDS["number"], credit_card.number)
 
-        if amount: #check to see if we should send an amount
-            self.set(self.REQUEST_FIELDS['amount'], amount)
+        if amount:  # check to see if we should send an amount
+            self.set(self.REQUEST_FIELDS["amount"], amount)
 
         # send transaction to gateway
         response, response_time = self.request()
@@ -270,18 +290,25 @@ class USAePay(PostGateway):
         # decide which url to use (test|live)
         url = self.API_URI[self.test]
 
-        debug_string = self._get_debug_str_base() + '.request() -- Attempting request to: '
-        logger.debug(debug_string.center(80, '='))
+        debug_string = (
+            self._get_debug_str_base() + ".request() -- Attempting request to: "
+        )
+        logger.debug(debug_string.center(80, "="))
         logger.debug("\n %s with params: %s" % (url, self.params()))
 
         # make the request
-        start = time.time() # timing it
+        start = time.time()  # timing it
         response = self.make_request(url)
-        end = time.time() # done timing it
-        response_time = '%0.2f' % (end-start)
+        end = time.time()  # done timing it
+        response_time = "%0.2f" % (end - start)
 
-        debug_string = self._get_debug_str_base() + '.request()  -- Request completed in ' + response_time + 's '
-        logger.debug(debug_string.center(80, '='))
+        debug_string = (
+            self._get_debug_str_base()
+            + ".request()  -- Request completed in "
+            + response_time
+            + "s "
+        )
+        logger.debug(debug_string.center(80, "="))
 
         return response, response_time
 
@@ -289,17 +316,17 @@ class USAePay(PostGateway):
         """
         On Specific Gateway due differences in response from gateway
         """
-        debug_string = self._get_debug_str_base() + '.parse() -- Raw response: '
-        logger.debug(debug_string.center(80, '='))
-        logger.debug('\n ' + str(response))
+        debug_string = self._get_debug_str_base() + ".parse() -- Raw response: "
+        logger.debug(debug_string.center(80, "="))
+        logger.debug("\n " + str(response))
 
-        #splitting up response into a list so we can map it to Paython generic response
+        # splitting up response into a list so we can map it to Paython generic response
         new_response = urllib.parse.parse_qsl(response)
         response = dict(new_response)
-        approved = (response['UMresult'] == 'A')
+        approved = response["UMresult"] == "A"
 
-        debug_string = self._get_debug_str_base() + '.parse() -- Response as list: '
-        logger.debug(debug_string.center(80, '='))
-        logger.debug('\n' + str(response))
+        debug_string = self._get_debug_str_base() + ".parse() -- Response as list: "
+        logger.debug(debug_string.center(80, "="))
+        logger.debug("\n" + str(response))
 
         return self.standardize(response, self.RESPONSE_KEYS, response_time, approved)
