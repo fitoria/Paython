@@ -115,6 +115,17 @@ class AuthorizeNetNew(JsonGateway):
         debug_string = " paython.gateways.authorize_net.use_credit_card() -- Just set up a credit card "
         logger.debug(debug_string.center(80, "="))
 
+    def set_customer_info(self, **kwargs):
+        cust_info = OrderedDict()
+        cust_info["type"] = kwargs.get("type", "individual")
+        cust_info["email"] = kwargs.get("email", "")
+        cust_info["phoneNumber"] = kwargs.get("phone", "")
+        method_name = kwargs.get("method_name", "transactionRequest")
+        self.REQUEST_DICT[method_name]["customer"] = cust_info
+        logger.debug(
+            "paython.gateways.authorize_net.set_customer_info() -- Just set up customer info "
+        )
+
     def set_billing_info(self, **kwargs):
         bill_info = OrderedDict()
         bill_info["firstName"] = kwargs.get("first_name", "")
@@ -122,6 +133,7 @@ class AuthorizeNetNew(JsonGateway):
         bill_info["company"] = kwargs.get("company", "")
         bill_info["address"] = kwargs.get("address", "")
         bill_info["city"] = kwargs.get("city", "")
+        bill_info["state"] = kwargs.get("state", "")
         bill_info["zip"] = kwargs.get("zip_code", "")
         bill_info["country"] = kwargs.get("country", "")
         method_name = kwargs.get("method_name", "transactionRequest")
@@ -137,8 +149,10 @@ class AuthorizeNetNew(JsonGateway):
         ship_to["company"] = kwargs.get("company", "")
         ship_to["address"] = kwargs.get("address", "")
         ship_to["city"] = kwargs.get("city", "")
+        ship_to["state"] = kwargs.get("state", "")
         ship_to["zip"] = kwargs.get("zip_code", "")
         ship_to["country"] = kwargs.get("country", "")
+        # ship_to["phoneNumber"] = kwargs.get("phone", "")
         method_name = kwargs.get("method_name", "transactionRequest")
         self.REQUEST_DICT[method_name]["shipTo"] = ship_to
         logger.debug(
@@ -294,6 +308,7 @@ class AuthorizeNetNew(JsonGateway):
         start_date,
         total_occurrences,
         shipping_info=None,
+        customer_info=None,
     ):
         """Creates a subscription (recurring billing)"""
         self.charge_setup(
@@ -312,6 +327,8 @@ class AuthorizeNetNew(JsonGateway):
         self.REQUEST_DICT["subscription"]["trialAmount"] = "0"
         self.use_credit_card(credit_card, "subscription")
         self.set_billing_info(method_name="subscription", **billing_info)
+        # if customer_info:
+        #     self.set_customer_info(method_name="subscription", **customer_info)
         if shipping_info:
             self.set_shipping_info(method_name="subscription", **shipping_info)
 
