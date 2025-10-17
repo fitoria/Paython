@@ -230,6 +230,7 @@ class AuthorizeNetNew(JsonGateway):
         billing_info=None,
         shipping_info=None,
         line_item={},
+        order_info=None,
     ):
         """
         Sends transaction for capture (same day settlement) based on amount.
@@ -256,6 +257,9 @@ class AuthorizeNetNew(JsonGateway):
         if line_item:
             line_items = {"lineItem": line_item}
             self.REQUEST_DICT["transactionRequest"]["lineItems"] = line_items
+
+        if order_info:
+            self.REQUEST_DICT["transactionRequest"]["order"] = order_info
 
         if billing_info:
             self.set_billing_info(**billing_info)
